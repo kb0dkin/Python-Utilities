@@ -264,6 +264,8 @@ def getdigfactor(ext_headers, idx):
     return float(max_analog - min_analog) / float(max_digital - min_digital)
 
 
+
+
 # </editor-fold>
 
 
@@ -494,6 +496,33 @@ def check_filesize(file_size):
         return int(file_size)
 
 
+
+# Pulling in the duration of the file when the file is initialized
+# to match the matlab struct more closely.
+# This means a user won't have to read all the data to know the length of the file
+#
+# This will return the FID to the current location when done, so it shouldn't mess
+# up any other of the read portions
+#
+# K. Bodkin 2023
+def fileduration(fid, packet_length, sample_rate):
+    curr_loc = fid.tell() # current location 
+    
+    fid.seek(-packet_length) # eof minus BR data packet length
+    last_ts = fid.read(calc_size("<I")) # last timestamp, which is a uint32
+    fid.seek(curr_loc) # return to old location
+
+    duration = float(unpack("<I",last_ts)) # convert the unpacked bytestring into a float
+    duration_sec = duration/sample_rate
+    
+    return duration, duration_sec
+
+
+
+
+
+
+
 # </editor-fold>
 
 
@@ -540,6 +569,13 @@ class NevFile:
                 and float(self.basic_header["FileSpec"]) < 2.3
             ):
                 self.extended_headers[i]["SpikeWidthSamples"] = WAVEFORM_SAMPLES_21
+
+        
+        # data duration in samples and seconds (K. Bodkin Feb 2023)
+        packet_length = self.basic_header.BytesInDataPacket
+        sample_rate = self.basic_header.SampleTimeResolution
+        duration, duration_sec = fileduration(self.datafile, packet_length, sample_rate)
+
 
     def getdata(self, elec_ids="all", wave_read="read"):
         """
