@@ -574,6 +574,8 @@ class NevFile:
         packet_length = self.basic_header['BytesInDataPackets']
         sample_rate = self.basic_header['SampleTimeResolution']
         duration, duration_sec = fileduration(self.datafile, packet_length, sample_rate)
+        self.basic_header['duration'] = duration
+        self.basic_header['duration_sec'] = duration_sec
 
 
     def getdata(self, elec_ids="all", wave_read="read"):
