@@ -507,8 +507,7 @@ def check_filesize(file_size):
 # K. Bodkin 2023
 def fileduration(fid, packet_length, sample_rate):
     curr_loc = fid.tell() # current location 
-    
-    fid.seek(-packet_length) # eof minus BR data packet length
+    fid.seek(-packet_length,2) # eof minus BR data packet length
     last_ts = fid.read(calc_size("<I")) # last timestamp, which is a uint32
     fid.seek(curr_loc) # return to old location
 
