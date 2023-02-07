@@ -572,8 +572,8 @@ class NevFile:
 
         
         # data duration in samples and seconds (K. Bodkin Feb 2023)
-        packet_length = self.basic_header.BytesInDataPackets
-        sample_rate = self.basic_header.SampleTimeResolution
+        packet_length = self.basic_header['BytesInDataPackets']
+        sample_rate = self.basic_header['SampleTimeResolution']
         duration, duration_sec = fileduration(self.datafile, packet_length, sample_rate)
 
 
