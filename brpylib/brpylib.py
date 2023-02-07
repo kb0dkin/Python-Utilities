@@ -511,7 +511,7 @@ def fileduration(fid, packet_length, sample_rate):
     last_ts = fid.read(calcsize("<I")) # last timestamp, which is a uint32
     fid.seek(curr_loc) # return to old location
 
-    duration = float(unpack("<I",last_ts)) # convert the unpacked bytestring into a float
+    duration = float(unpack("<I",last_ts[0])) # convert the unpacked bytestring into a float
     duration_sec = duration/sample_rate
     
     return duration, duration_sec
